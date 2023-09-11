@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'danFun.dart' as dan_fun;
 
@@ -493,6 +494,18 @@ class _HomeStateWidget extends State<HomeScreen>{
 class _IProfilePage extends State<IProfileScreen> {
 
   get hyperTitle => widget.hyperTitle;
+
+  // Obtain shared preferences.
+   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+
+  }
+//   final SharedPreferences prefs = await SharedPreferences.getInstance();
+//
+// // Save an integer value to 'counter' key.
+//   await prefs.setInt('counter', 10);
 
 
 
