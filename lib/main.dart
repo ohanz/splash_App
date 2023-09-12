@@ -425,6 +425,7 @@ class _HomeStateWidget extends State<HomeScreen>{
 
   String get userName => widget.userNym;
   late String sub;
+  String hypeTitle = 'Ohanzyung', country = 'Biafra Republic'; int age = 20;
 
   @override
   void initState() {
@@ -442,6 +443,18 @@ class _HomeStateWidget extends State<HomeScreen>{
      }
 
 
+  }
+
+  void _hyperStateLoader() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      // _counter = (prefs.getInt('counter') ?? 0) + 1;
+      // prefs.setInt('counter', _counter);
+       (prefs.setString('hypeTitle', hypeTitle));
+       (prefs.setString('hypeName', userName));
+      (prefs.setInt('age', age));
+      (prefs.setString('country', country));
+    });
   }
 
   @override
@@ -463,9 +476,10 @@ class _HomeStateWidget extends State<HomeScreen>{
                           child:
                           GestureDetector( onTap: () => {
                             if (kDebugMode) print("Iprofile Tapped"),
+                            _hyperStateLoader(),
                             Navigator.push(context,
                                 MaterialPageRoute(builder: (_) =>
-                                 IProfileScreen(hyperTitle: widget.userNym, hyperName: "", age: "", country: ""),))
+                                 IProfileScreen(hyperTitle: hypeTitle, hyperName: widget.userNym, age: age, country: country),))
                           },
                           child: Text(sub, style: const TextStyle(fontSize: 18))
                       )),
@@ -484,7 +498,7 @@ class _HomeStateWidget extends State<HomeScreen>{
 
   const IProfileScreen({super.key, required this.hyperTitle, required this.hyperName, required this.age, required this.country});
   
-  final String hyperTitle, hyperName, age, country;
+  final String hyperTitle, hyperName,country; final int age;
 
   @override
   State<StatefulWidget> createState() => _IProfilePage();
@@ -495,29 +509,123 @@ class _IProfilePage extends State<IProfileScreen> {
 
   get hyperTitle => widget.hyperTitle;
 
+  String _hypeName = '', _hypeTitle = '', _country = ''; int _age = 0;
+
   // Obtain shared preferences.
    @override
   void initState() {
     // TODO: implement initState
     super.initState();
-
+    _getHyperState();
   }
 //   final SharedPreferences prefs = await SharedPreferences.getInstance();
 //
 // // Save an integer value to 'counter' key.
 //   await prefs.setInt('counter', 10);
-
+   void _getHyperState() async {
+     final prefs = await SharedPreferences.getInstance();
+     setState(() {
+       _hypeTitle = (prefs.getString('hypeTitle') ?? '');
+       _hypeName = (prefs.getString('hypeName') ?? '');
+       _age = (prefs.getInt('age') ?? 0);
+       _country = (prefs.getString('country') ?? '');
+     });
+   }
 
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: TextButton(
-          onPressed: () => dan_fun.simpleToast('Welcome to Iprofile, $hyperTitle'),
-          child: const Text("Tap For Welcome"),
-        ),
-      ),
+      body: ListView(
+        children: [
+          Container(
+            alignment: Alignment.topCenter,
+            constraints: const BoxConstraints.tightFor(),
+            // child: Center(
+              child: Container(
+                margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 50.0), width: double.infinity, color: Colors.lightBlue,
+                child: Column(
+                  children: [
+                    Column(children: [
+                      Text(_hypeTitle),
+                      Text(_hypeName), // Nicknames will be replaced if added
+                    ],
+                    ),
+                    Container(
+                      margin: const EdgeInsets.fromLTRB(0, 10.0, 0.0, 10.0),
+                      child: CircleAvatar(
+                        // maxRadius: 50,
+                        radius: 120,
+                        backgroundColor: Colors.black,
+                        child:
+                        // Image(image: AssetImage('images/green-heart.png')),
+                        // Image.asset('assets/images/green-heart.png',height: 50, width: 50),
+                        // Icon(Icons.person, color: Colors.white, size: 50),
+                        CircleAvatar(
+                          onBackgroundImageError: (_, __) {
+                            setState(() {
+                              Fluttertoast.showToast(msg: 'error occurred');
+                            });
+                          },
+                          radius: 110,
+                          backgroundImage: const AssetImage('assets/images/red-heart.jpg'),
+                        ),
+                      ),
+                    ),
+                    Row(
+                      children: [
+                        Container(child: TextButton(onPressed: () {  },
+                            child: Text('Number of Splashers..')),),
+                        Container(width: 180, height:90, child: Column(
+                          children: [
+                            Text('HyeRate'),
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.center,
+                              children: [
+                              Icon(Icons.star, size: 10,),
+                              Icon(Icons.star, size: 10,),
+                              Icon(Icons.star, size: 10,),
+                              Icon(Icons.star, size: 10,),
+                              Icon(Icons.star, size: 10,),
+                            ],)
+                          ],
+                        ),)
+
+                      ],
+                    ),
+
+                  ],
+                ),
+              ),
+            // ),
+          ),
+          Center(
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  'My Name is $_hypeTitle, @$_hypeName',style: TextStyle(fontWeight: FontWeight.bold),
+                ),
+                Text(
+                  'Aged: $_age',
+                  style: Theme.of(context).textTheme.headlineMedium,
+                ),
+                Text(
+                  'From $_country',
+                  style: Theme.of(context).textTheme.headline4,
+                ),
+                // Container(child: ma,),
+                TextButton(
+                  onPressed: () => dan_fun.simpleToast('Welcome to Iprofile, $hyperTitle'),
+                  child: const Text("Tap For Welcome"),
+                ),
+              ],
+            ),
+
+          ),
+        ],
+      )
+
     );
   }
 
