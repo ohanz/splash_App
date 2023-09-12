@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -18,6 +19,7 @@ class DanApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Splash APP',
       theme: ThemeData(
         // This is the theme of your application.
@@ -150,6 +152,7 @@ class _SecondScreenState extends State<SecondScreen>{
   }
 
   void _logIn(BuildContext cxt){
+    SystemNavigator.pop();
     Navigator.push(cxt, MaterialPageRoute(builder: (_) => const _LogInScreen()));
   }
   void _someToast(){
@@ -356,6 +359,37 @@ class _LoginScreenState extends State<_LogInScreen> {
   Color saveColor = Colors.white;
   String username = "Hyper";
 
+  Future<void> _showSimpleDialog() async {
+    await showDialog<void>(
+        context: context,
+        builder: (BuildContext context) {
+          return SimpleDialog( // <-- SEE HERE
+            title: const Text('Select Booking Type'),
+            children: <Widget>[
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('General'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Silver'),
+              ),
+              SimpleDialogOption(
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+                child: const Text('Gold'),
+              ),
+            ],
+          );
+        });
+  }
+
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -373,6 +407,7 @@ class _LoginScreenState extends State<_LogInScreen> {
               saveColor = Colors.white60;
               Navigator.push(context, MaterialPageRoute(builder:
                   (_) => HomeScreen(welcomeText: 'Hyper', urlLink: 'app.ihype.company/', userNym: username)));
+              // SystemNavigator.pop();
             });
           }, style: TextButton.styleFrom(
             foregroundColor: saveColor,
@@ -401,6 +436,25 @@ class _LoginScreenState extends State<_LogInScreen> {
           //
           // ),
         ],// non_const as we might change text 'saving..'
+      ),
+      body: ListView(
+        children: [
+          Center(child:
+          // --- Button Widget --- //
+          ElevatedButton(
+            onPressed: (){
+              _showSimpleDialog();
+              // if (Navigator.canPop(context)) {
+              //   Navigator.pop(context);
+              // } else {
+              //   SystemNavigator.pop();
+              // }
+            },
+            child: const Text('Show Simple Dialog',
+              style: TextStyle(fontSize: 24),
+            ),
+          ),)
+        ],
       ),
     );
   }
@@ -457,38 +511,113 @@ class _HomeStateWidget extends State<HomeScreen>{
     });
   }
 
+
+  Future<bool> _onWillPop(BuildContext context) async {
+    bool? exitResult = await _showExitBottomSheet(context);
+    return exitResult ?? false;
+  }
+
+  Future<bool?> _showExitBottomSheet(BuildContext context) async {
+    return await showModalBottomSheet(
+      backgroundColor: Colors.transparent,
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          padding: const EdgeInsets.all(16),
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(24),
+              topRight: Radius.circular(24),
+            ),
+          ),
+          child: _buildBottomSheet(context),
+        );
+      },
+    );
+  }
+
+
+  Widget _buildBottomSheet(BuildContext context) {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        const SizedBox(
+          height: 24,
+        ),
+        Text(
+          'Do you really want to exit the app?',
+          style: Theme.of(context).textTheme.headline6,
+        ),
+        const SizedBox(
+          height: 24,
+        ),
+        Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            TextButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(
+                  const EdgeInsets.symmetric(
+                    horizontal: 8,
+                  ),
+                ),
+              ),
+              onPressed: () => Navigator.of(context).pop(false),
+              child: const Text('CANCEL'),
+            ),
+            TextButton(
+              style: ButtonStyle(
+                padding: MaterialStateProperty.all(
+                  const EdgeInsets.symmetric(
+                    horizontal: 8,
+                  ),
+                ),
+              ),
+              onPressed: () => Navigator.of(context).pop(true),
+              child: const Text('YES, EXIT'),
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        automaticallyImplyLeading: false,
-          // leadingWidth: 50,
-          leading:
-               // Padding(padding: const EdgeInsets.all(16.0),
-                  Row(
-                    children: [
-                      Container(
-                        margin: const EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 0.0),
-                        height: 50, width: 50,
-                          child: CircleAvatar(
-                          // radius: 50,
-                          backgroundColor: Colors.brown,
-                          child:
-                          GestureDetector( onTap: () => {
-                            if (kDebugMode) print("Iprofile Tapped"),
-                            _hyperStateLoader(),
-                            Navigator.push(context,
-                                MaterialPageRoute(builder: (_) =>
-                                 IProfileScreen(hyperTitle: hypeTitle, hyperName: widget.userNym, age: age, country: country),))
-                          },
-                          child: Text(sub, style: const TextStyle(fontSize: 18))
-                      )),
-                      )
-                    ],
-                  ),
+    return WillPopScope(
+      onWillPop: ()=> _onWillPop(context),
+      child: Scaffold(
+        appBar: AppBar(
+          automaticallyImplyLeading: false,
+            // leadingWidth: 50,
+            leading:
+                 // Padding(padding: const EdgeInsets.all(16.0),
+                    Row(
+                      children: [
+                        Container(
+                          margin: const EdgeInsets.fromLTRB(5.0, 0.0, 0.0, 0.0),
+                          height: 50, width: 50,
+                            child: CircleAvatar(
+                            // radius: 50,
+                            backgroundColor: Colors.brown,
+                            child:
+                            GestureDetector( onTap: () => {
+                              if (kDebugMode) print("Iprofile Tapped"),
+                              _hyperStateLoader(),
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (_) =>
+                                   IProfileScreen(hyperTitle: hypeTitle, hyperName: widget.userNym, age: age, country: country),))
+                            },
+                            child: Text(sub, style: const TextStyle(fontSize: 18))
+                        )),
+                        )
+                      ],
+                    ),
 
-        title: Text("Hye, ${widget.welcomeText}!")
-      )
+          title: Text("Hye, ${widget.welcomeText}!")
+        )
+      ),
     );
   }
 
@@ -535,95 +664,119 @@ class _IProfilePage extends State<IProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: ListView(
-        children: [
-          Container(
-            alignment: Alignment.topCenter,
-            constraints: const BoxConstraints.tightFor(),
-            // child: Center(
-              child: Container(
-                margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 50.0), width: double.infinity, color: Colors.lightBlue,
-                child: Column(
-                  children: [
-                    Column(children: [
-                      Text(_hypeTitle),
-                      Text(_hypeName), // Nicknames will be replaced if added
-                    ],
-                    ),
-                    Container(
-                      margin: const EdgeInsets.fromLTRB(0, 10.0, 0.0, 10.0),
-                      child: CircleAvatar(
-                        // maxRadius: 50,
-                        radius: 120,
-                        backgroundColor: Colors.black,
-                        child:
-                        // Image(image: AssetImage('images/green-heart.png')),
-                        // Image.asset('assets/images/green-heart.png',height: 50, width: 50),
-                        // Icon(Icons.person, color: Colors.white, size: 50),
-                        CircleAvatar(
-                          onBackgroundImageError: (_, __) {
-                            setState(() {
-                              Fluttertoast.showToast(msg: 'error occurred');
-                            });
-                          },
-                          radius: 110,
-                          backgroundImage: const AssetImage('assets/images/red-heart.jpg'),
-                        ),
+    return Material(
+      color: Colors.lightBlue,
+      child: SafeArea(
+        child: SizedBox.expand(
+          child: Container(
+            foregroundDecoration: null,
+            color: Colors.white,
+            child: ListView(
+              children: [
+                Container(
+                  alignment: Alignment.topCenter,
+                  constraints: const BoxConstraints.tightFor(),
+                  // child: Center(
+                    child: Container(
+                      padding: const EdgeInsets.fromLTRB(0, 10.0, 0.0, 10.0),
+                      margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 50.0), width: double.infinity, color: Colors.lightBlue,
+                      child: Column(
+                        children: [
+                          Column(
+                            children: [
+                            Container(
+                              margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 5.0),
+                              child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Image.asset('assets/images/green-heart.png',height: 15, width: 15),
+                                Text(_hypeTitle, style: const TextStyle(fontSize: 19, color: Colors.white)),],
+                            ),),
+                            Text(_hypeName, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w700, color: Colors.white)), // Nicknames will be replaced if added
+                          ],
+                          ),
+
+                          Container(
+                            margin: const EdgeInsets.fromLTRB(0, 25.0, 0.0, 10.0),
+                            child: CircleAvatar(
+                              // maxRadius: 50,
+                              radius: 120,
+                              backgroundColor: Colors.black,
+                              child:
+                              // Image(image: AssetImage('images/green-heart.png')),
+                              // Image.asset('assets/images/green-heart.png',height: 50, width: 50),
+                              // Icon(Icons.person, color: Colors.white, size: 50),
+                              CircleAvatar(
+                                onBackgroundImageError: (_, __) {
+                                  setState(() {
+                                    Fluttertoast.showToast(msg: 'error occurred');
+                                  });
+                                },
+                                radius: 110,
+                                backgroundImage: const AssetImage('assets/images/red-heart.jpg'),
+                              ),
+                            ),
+                          ),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Container(child: TextButton(onPressed: () {  },
+                                  child: Text('X Number of Splashers..')),
+                              ),
+                              Container(width: 180, height:90,
+                                color: Colors.black12,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Text('HyeRate', style: TextStyle(fontSize: 20, color: Colors.white),),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                    Icon(Icons.star, size: 25,),
+                                    Icon(Icons.star_half, size: 25,),
+                                    Icon(Icons.star_border, size: 25,),
+                                    Icon(Icons.star_border, size: 25,),
+                                    Icon(Icons.star_border, size: 25,),
+                                  ],)
+                                ],
+                              ),)
+
+                            ],
+                          ),
+
+                        ],
                       ),
                     ),
-                    Row(
-                      children: [
-                        Container(child: TextButton(onPressed: () {  },
-                            child: Text('Number of Splashers..')),),
-                        Container(width: 180, height:90, child: Column(
-                          children: [
-                            Text('HyeRate'),
-                            Row(
-                              crossAxisAlignment: CrossAxisAlignment.center,
-                              children: [
-                              Icon(Icons.star, size: 10,),
-                              Icon(Icons.star, size: 10,),
-                              Icon(Icons.star, size: 10,),
-                              Icon(Icons.star, size: 10,),
-                              Icon(Icons.star, size: 10,),
-                            ],)
-                          ],
-                        ),)
+                  // ),
+                ),
+                Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'My Name is $_hypeTitle, @$_hypeName',style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                      Text(
+                        'Aged: $_age',
+                        style: Theme.of(context).textTheme.headlineMedium,
+                      ),
+                      Text(
+                        'From $_country',
+                        style: Theme.of(context).textTheme.headline4,
+                      ),
+                      // Container(child: ma,),
+                      TextButton(
+                        onPressed: () => dan_fun.simpleToast('Welcome to Iprofile, $hyperTitle'),
+                        child: const Text("Tap For Welcome"),
+                      ),
+                    ],
+                  ),
 
-                      ],
-                    ),
-
-                  ],
-                ),
-              ),
-            // ),
-          ),
-          Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'My Name is $_hypeTitle, @$_hypeName',style: TextStyle(fontWeight: FontWeight.bold),
-                ),
-                Text(
-                  'Aged: $_age',
-                  style: Theme.of(context).textTheme.headlineMedium,
-                ),
-                Text(
-                  'From $_country',
-                  style: Theme.of(context).textTheme.headline4,
-                ),
-                // Container(child: ma,),
-                TextButton(
-                  onPressed: () => dan_fun.simpleToast('Welcome to Iprofile, $hyperTitle'),
-                  child: const Text("Tap For Welcome"),
                 ),
               ],
             ),
-
           ),
-        ],
+        ),
       )
 
     );
