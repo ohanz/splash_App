@@ -78,9 +78,9 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   void initState() {
     super.initState();
-    Timer(Duration(seconds: 3),
+     Timer(Duration(seconds: 3),
             ()=>Navigator.pushReplacement(context,
-            MaterialPageRoute(builder: (context) => SecondScreen()
+            MaterialPageRoute(builder: (context) => const SecondScreen()
             )
         )
     );
@@ -152,7 +152,6 @@ class _SecondScreenState extends State<SecondScreen>{
   }
 
   void _logIn(BuildContext cxt){
-    SystemNavigator.pop();
     Navigator.push(cxt, MaterialPageRoute(builder: (_) => const _LogInScreen()));
   }
   void _someToast(){
@@ -178,6 +177,8 @@ class _SecondScreenState extends State<SecondScreen>{
         textColor: Colors.white
     );
   }
+
+  final _formKey = GlobalKey<FormState>();
 
   @override
   Widget build(BuildContext context) {
@@ -297,8 +298,70 @@ class _SecondScreenState extends State<SecondScreen>{
               children:[
 
                 show?Container( //check if show == true, if true, then show container
-                  height: 150,
                   color: Colors.lightBlue,
+                  child: Form(
+                    key: _formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.person),
+                            hintText: 'Your Name',
+                            labelText: 'Name',
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'A message for Coding Ninjas';
+                            }
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.phone),
+                            hintText: 'Enter a phone number',
+                            labelText: 'Phone',
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter valid phone number';
+                            }
+                            return null;
+                          },
+                        ),
+                        TextFormField(
+                          decoration: const InputDecoration(
+                            icon: Icon(Icons.calendar_today),
+                            hintText: 'Enter your date of birth',
+                            labelText: 'Dob',
+                          ),
+                          validator: (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Please enter valid date';
+                            }
+                            return null;
+                          },
+                        ),
+                        Container(
+                            padding: const EdgeInsets.only(left: 130.0, bottom: 50.0, top: 40.0),
+                            child: ElevatedButton(
+                              child: const Text('Submit'),
+                              onPressed: () {
+                                // It returns true if the form is valid, otherwise returns false
+
+                                if (_formKey.currentState!.validate()) {
+                                  // If the form is valid, display a Snackbar.
+                                  // Scaffold.of(context).showSnackBar(SnackBar(content: Text('Data is in processing.')));
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(content: Text('Processing Data..')),
+                                  );
+                                }
+                              },
+                            )),
+                      ],
+                    ),
+                  ),
                 ):Container(), //if show == false, show empty container.
 
                 const Divider(),
@@ -407,7 +470,10 @@ class _LoginScreenState extends State<_LogInScreen> {
               saveColor = Colors.white60;
               Navigator.push(context, MaterialPageRoute(builder:
                   (_) => HomeScreen(welcomeText: 'Hyper', urlLink: 'app.ihype.company/', userNym: username)));
-              // SystemNavigator.pop();
+              // Future.delayed(const Duration(seconds: 3),(){ SystemNavigator.pop();
+              //   if (kDebugMode) {
+              //   print("Waited for 3secs...");
+              // } });
             });
           }, style: TextButton.styleFrom(
             foregroundColor: saveColor,
