@@ -133,28 +133,47 @@ class SecondScreen extends StatefulWidget {
 
 }
 
-class _SecondScreenState extends State<SecondScreen>{
+class _SecondScreenState extends State<SecondScreen> {
 
   bool _confirm = false;
   bool show = true; //bool value to track show and hide for widget.
-  String valAppBar = "Welcome!"; String valBody = "Hello there, Welcome to the Splash Verse!";
-  Color color = Colors.pink; String iSave = 'Login';
+  String valAppBar = "Welcome!";
+  String valBody = "Hello there, Welcome to the Splash Verse!";
+  Color color = Colors.pink;
+  String iSave = 'Login';
   String enterConfirm = "Enter Your Details";
   String tapWord = 'Tap to Proceed';
 
   bool isErrorOccurred = false;
+
+
+  Color color1 = dan_fun.HexColor("b74093");
+  Color colorS = dan_fun.HexColor("#D3D3D3");
+  Color color2 = dan_fun.HexColor("#b74093");
+  Color color3 = dan_fun.HexColor("#88b74093"); // If you wish to use ARGB format
 
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     show = false;
+
+    setState(() {
+      myController.addListener(_printLatestValue);
+    });
   }
 
-  void _logIn(BuildContext cxt){
-    Navigator.push(cxt, MaterialPageRoute(builder: (_) => const _LogInScreen()));
+  void _printLatestValue() {
+    final text = myController.text;
+    print('Second text field: $text (${text.characters.length})');
   }
-  void _someToast(){
+
+  void _logIn(BuildContext cxt) {
+    Navigator.push(
+        cxt, MaterialPageRoute(builder: (_) => const _LogInScreen()));
+  }
+
+  void _someToast() {
     if (kDebugMode) print('clicks here');
     setState(() {
       _confirm = true;
@@ -164,10 +183,9 @@ class _SecondScreenState extends State<SecondScreen>{
       valBody = 'Hye there, Hyper! Sign Up Now to Proceed.';
       iSave = 'Login Now!';
     });
-
   }
 
-  void sToast(String msg){
+  void sToast(String msg) {
     Fluttertoast.showToast(
         msg: msg,
         toastLength: Toast.LENGTH_SHORT,
@@ -179,233 +197,254 @@ class _SecondScreenState extends State<SecondScreen>{
   }
 
   final _formKey = GlobalKey<FormState>();
+  final myController = TextEditingController();
+  bool isValidated = false;
+
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: AppBar(title:Text(valAppBar),
-          leading: const Padding(padding: EdgeInsets.all(16.0), child: Icon(Icons.create_sharp)),
+        appBar: AppBar(title: Text(valAppBar),
+          leading: const Padding(
+              padding: EdgeInsets.all(16.0), child: Icon(Icons.create_sharp)),
           leadingWidth: 30,
-        actions: <Widget>[
-      //   TextButton(
-      //     style: TextButton.styleFrom(
-      //   foregroundColor: Colors.white,
-      //   padding: const EdgeInsets.all(16.0),
-      //   textStyle: const TextStyle(fontSize: 18),
-      // ), //   child: Text(iSave),
-      //               // onPressed: ()=> _logIn(context),
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: Stack(
-              children: <Widget>[
-                // Positioned.fill(
-                //   child: Container(
-                //     decoration: const BoxDecoration(
-                //       gradient: LinearGradient(
-                //         colors: <Color>[
-                //           Color(0xFF0D47A1),
-                //           Color(0xFF1976D2),
-                //           Color(0xFF42A5F5),
-                //         ],
-                //       ),
-                //     ),
-                //   ),
-                // ),
-                SizedBox(
-                  height: 100,
-                  width: 150,
-                  child: TextButton(
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.all(16.0),
-                      textStyle: const TextStyle(fontSize: 20),
+          actions: <Widget>[
+            //   TextButton(
+            //     style: TextButton.styleFrom(
+            //   foregroundColor: Colors.white,
+            //   padding: const EdgeInsets.all(16.0),
+            //   textStyle: const TextStyle(fontSize: 18),
+            // ), //   child: Text(iSave),
+            //               // onPressed: ()=> _logIn(context),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(4),
+              child: Stack(
+                children: <Widget>[
+                  // Positioned.fill(
+                  //   child: Container(
+                  //     decoration: const BoxDecoration(
+                  //       gradient: LinearGradient(
+                  //         colors: <Color>[
+                  //           Color(0xFF0D47A1),
+                  //           Color(0xFF1976D2),
+                  //           Color(0xFF42A5F5),
+                  //         ],
+                  //       ),
+                  //     ),
+                  //   ),
+                  // ),
+                  SizedBox(
+                    height: 100,
+                    width: 150,
+                    child: TextButton(
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.all(16.0),
+                        textStyle: const TextStyle(fontSize: 20),
+                      ),
+                      onPressed: () => _logIn(context),
+                      child: Text(iSave),
                     ),
-                    onPressed: ()=> _logIn(context),
-                    child: Text(iSave),
                   ),
-                ),
 
-              ],
+                ],
+              ),
+
+
             ),
-
-
-        ),
-      ],),
-      // body: Center(
-      //     // child:Text("Welcome!",textScaleFactor: 2,),
-      //   child: Stack(
-      //     // alignment: Alignment.center,
-      //     children: <Widget>[
-      //       Container(
-      //           margin: const EdgeInsets.fromLTRB(20.0, 15.0, 0.0, 10.0),
-      //           child: Text(valBody,
-      //             style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 22.0),)
-      //       ),
-      //       Container(
-      //           alignment: Alignment.center,
-      //           // margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 100.0),
-      //           child: ElevatedButton(
-      //             onPressed: () => _someToast(),
-      //               child: const Text('Tap to Proceed')),
-      //           ),
-      //     ],
-      //   ),
-      // ),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
-        children: <Widget>[
-          Container(
-              margin: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 50.0),
-              child: Text(valBody,
-                style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 22.0),)
-          ),
-           CircleAvatar(
-            // maxRadius: 50,
-            radius: 120,
-            backgroundColor: Colors.black,
-            child:
-            // Image(image: AssetImage('images/green-heart.png')),
-            // Image.asset('assets/images/green-heart.png',height: 50, width: 50),
-            // Icon(Icons.person, color: Colors.white, size: 50),
-             CircleAvatar(
-              onBackgroundImageError: (_, __) {
-              setState(() {
-                Fluttertoast.showToast(msg: 'error occurred');
-              });
-            },
-              radius: 110,
-              backgroundImage: const AssetImage('assets/images/red-heart.jpg'),
+          ],),
+        // body: Center(
+        //     // child:Text("Welcome!",textScaleFactor: 2,),
+        //   child: Stack(
+        //     // alignment: Alignment.center,
+        //     children: <Widget>[
+        //       Container(
+        //           margin: const EdgeInsets.fromLTRB(20.0, 15.0, 0.0, 10.0),
+        //           child: Text(valBody,
+        //             style: TextStyle(color: color, fontWeight: FontWeight.bold, fontSize: 22.0),)
+        //       ),
+        //       Container(
+        //           alignment: Alignment.center,
+        //           // margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 100.0),
+        //           child: ElevatedButton(
+        //             onPressed: () => _someToast(),
+        //               child: const Text('Tap to Proceed')),
+        //           ),
+        //     ],
+        //   ),
+        // ),
+        body: ListView(
+          padding: const EdgeInsets.all(20),
+          children: <Widget>[
+            Container(
+                margin: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 50.0),
+                child: Text(valBody,
+                  style: TextStyle(color: color,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 22.0),)
             ),
-    ),
-          const Center(
-            child: Text(
-              'Sign Up Here',
-              style: TextStyle(
-                fontSize: 50,
+            CircleAvatar(
+              // maxRadius: 50,
+              radius: 120,
+              backgroundColor: Colors.black,
+              child:
+              // Image(image: AssetImage('images/green-heart.png')),
+              // Image.asset('assets/images/green-heart.png',height: 50, width: 50),
+              // Icon(Icons.person, color: Colors.white, size: 50),
+              CircleAvatar(
+                onBackgroundImageError: (_, __) {
+                  setState(() {
+                    Fluttertoast.showToast(msg: 'error occurred');
+                  });
+                },
+                radius: 110,
+                backgroundImage: const AssetImage(
+                    'assets/images/red-heart.jpg'),
               ),
             ),
-          ),
-          show? Text(
-            enterConfirm,
-            style: const TextStyle(
-              fontSize: 20,
+            const Center(
+              child: Text(
+                'Sign Up Here',
+                style: TextStyle(
+                  fontSize: 50,
+                ),
+              ),
             ),
-          ):const Text(''),
-        Container(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-              children:[
-
-                show?Container( //check if show == true, if true, then show container
-                  color: Colors.lightBlue,
-                  child: Form(
-                    key: _formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.person),
-                            hintText: 'Your Name',
-                            labelText: 'Name',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'A message for Coding Ninjas';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.phone),
-                            hintText: 'Enter a phone number',
-                            labelText: 'Phone',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter valid phone number';
-                            }
-                            return null;
-                          },
-                        ),
-                        TextFormField(
-                          decoration: const InputDecoration(
-                            icon: Icon(Icons.calendar_today),
-                            hintText: 'Enter your date of birth',
-                            labelText: 'Dob',
-                          ),
-                          validator: (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Please enter valid date';
-                            }
-                            return null;
-                          },
-                        ),
-                        Container(
-                            padding: const EdgeInsets.only(left: 130.0, bottom: 50.0, top: 40.0),
-                            child: ElevatedButton(
-                              child: const Text('Submit'),
-                              onPressed: () {
-                                // It returns true if the form is valid, otherwise returns false
-
-                                if (_formKey.currentState!.validate()) {
-                                  // If the form is valid, display a Snackbar.
-                                  // Scaffold.of(context).showSnackBar(SnackBar(content: Text('Data is in processing.')));
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(content: Text('Processing Data..')),
-                                  );
+            show ? Text(
+              enterConfirm,
+              style: const TextStyle(
+                fontSize: 20,
+              ),
+            ) : const Text(''),
+            Container(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                  children: [
+                    show ? Container( //check if show == true, if true, then show container
+                      color: colorS, // lightBlue
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: <Widget>[
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                icon: Icon(Icons.person),
+                                hintText: 'Your Name',
+                                labelText: 'Name',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'A Hyper name is required';
                                 }
+                                return null;
                               },
-                            )),
-                      ],
+                            ),
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                icon: Icon(Icons.phone),
+                                hintText: 'Enter a phone number',
+                                labelText: 'Phone',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter valid phone number';
+                                }
+                                return null;
+                              },
+                            ),
+                            TextFormField(
+                              decoration: const InputDecoration(
+                                icon: Icon(Icons.calendar_today),
+                                hintText: 'Enter your date of birth',
+                                labelText: 'Dob',
+                              ),
+                              validator: (value) {
+                                if (value == null || value.isEmpty) {
+                                  return 'Please enter valid date';
+                                }
+                                return null;
+                              },
+                            ),
+                            Container(
+                                padding: const EdgeInsets.only(
+                                    left: 130.0, bottom: 50.0, top: 40.0),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey, // Background color
+                                  ),
+                                  child: const Text('Submit'),
+                                  onPressed: () {
+                                    // It returns true if the form is valid, otherwise returns false
+
+                                    if (_formKey.currentState!.validate()) {
+                                      // If the form is valid, display a Snackbar.
+                                      // Scaffold.of(context).showSnackBar(SnackBar(content: Text('Data is in processing.')));
+                                      isValidated = true;
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        const SnackBar(
+                                            content: Text('Processing Data..')),
+                                      );
+                                    }
+                                  },
+                                )),
+                          ],
+                        ),
+                      ),
+                    )
+                        : Container(), //if show == false, show empty container.
+
+                    const Divider(),
+
+                    Center(
+                      // child:Text("Welcome!",textScaleFactor: 2,),
+                      child: Stack(
+                        // alignment: Alignment.center,
+                        children: <Widget>[
+
+                          const Divider(),
+                          Container(
+                            alignment: Alignment.center,
+                            // margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 100.0),
+                            child: ElevatedButton(
+                                onPressed: () {
+                                  if (!_confirm) {
+                                    _someToast();
+                                  } else {
+                                    runConfirm();
+                                  }
+                                },
+                                child: Text(tapWord)),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ):Container(), //if show == false, show empty container.
 
-                const Divider(),
-
-      Center(
-            // child:Text("Welcome!",textScaleFactor: 2,),
-          child: Stack(
-            // alignment: Alignment.center,
-            children: <Widget>[
-
-              Container(
-                  alignment: Alignment.center,
-                  // margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 100.0),
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if(!_confirm) {
-                        _someToast();
-                      } else {
-                        runConfirm();
-                      }
-                    },
-                      child: Text(tapWord)),
-                  ),
-            ],
-          ),
-        ),
-
-              ]
-          ),
+                  ]
+              ),
+            )
+          ],
         )
-        ],
-      )
     );
   }
 
   void runConfirm() {
     if (kDebugMode) {
-      print('test here');
+      print('validation test here');
+
+      // Change button value on Validation
+      if (isValidated) {
+        setState(() {
+          tapWord = 'Sign Up Now';
+          // enterConfirm = 'Confirm your Details'; // to be used in confirmation
+        });
+      }
+
     }
-    setState(() {
-      tapWord = 'Sign Up Now';
-      // enterConfirm = 'Confirm your Details'; // to be used in confirmation
-    });
+
   }
+
 
 }
 
