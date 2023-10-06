@@ -139,6 +139,8 @@ class _SecondScreenState extends State<SecondScreen> {
   bool show = true; //bool value to track show and hide for widget.
   String valAppBar = "Welcome!";
   String valBody = "Hello there, Welcome to the Splash Verse!";
+  String snackText = 'Finishing Sign Up..';
+  String signUpWord = 'Sign Up Here';
   Color color = Colors.pink;
   String iSave = 'Login';
   String enterConfirm = "Enter Your Details";
@@ -149,8 +151,16 @@ class _SecondScreenState extends State<SecondScreen> {
 
   Color color1 = dan_fun.HexColor("b74093");
   Color colorS = dan_fun.HexColor("#D3D3D3");
+  Color colorSub = Colors.grey;
   Color color2 = dan_fun.HexColor("#b74093");
   Color color3 = dan_fun.HexColor("#88b74093"); // If you wish to use ARGB format
+
+  @override
+  void dispose() {
+    // Clean up the controller when the widget is disposed.
+    myControllerName.dispose();myControllerPhone.dispose();myControllerDOB.dispose();
+    super.dispose();
+  }
 
   @override
   void initState() {
@@ -159,13 +169,71 @@ class _SecondScreenState extends State<SecondScreen> {
     show = false;
 
     setState(() {
-      myController.addListener(_printLatestValue);
+      myControllerName.addListener(_printLatestName);
+      myControllerPhone.addListener(_printLatestPhoneNo);
+      myControllerDOB.addListener(_printLatestDOB);
+
     });
   }
 
-  void _printLatestValue() {
-    final text = myController.text;
-    print('Second text field: $text (${text.characters.length})');
+  late String textN, textP, textD;
+
+  void submitState(){
+    if(isName == true && isDOB == true && isPhoneNo == true) {
+      setState(() {
+        colorSub = Colors.green;
+      });
+      if (kDebugMode) {
+        print("$isName, $isDOB, $isPhoneNo");
+      }
+    } else {
+      setState(() {
+        colorSub = Colors.grey;
+        if (kDebugMode) {
+          print("$isName, $isDOB, $isPhoneNo");
+        }
+      });
+
+    }
+  }
+  void _printLatestName() {
+    textN = myControllerName.text;
+    print('Name text field: $textN (${textN.characters.length})');
+    // send state to context
+    if(textN.isNotEmpty) {
+      isName = true;
+      print("NameState: $isName");
+    } else {
+      isName = false;
+      print("NameState: $isName");
+    }
+    submitState();
+  }
+  void _printLatestPhoneNo() {
+    textP = myControllerPhone.text;
+    print('Phone text field: $textP (${textP.characters.length})');
+    // send state to context
+    if(textP.isNotEmpty) {
+      isPhoneNo = true;
+      print("PhoneState: $isPhoneNo");
+    } else {
+      isPhoneNo = false;
+      print("PhoneState: $isPhoneNo");
+    }
+    submitState();
+  }
+  void _printLatestDOB() {
+    textD = myControllerDOB.text;
+    print('DOB text field: $textD (${textD.characters.length})');
+    // send state to context
+    if(textD.isNotEmpty) {
+      isDOB = true;
+      print("isDOB: $isDOB");
+    } else {
+      isDOB = false;
+      print("isDOB: $isDOB");
+    }
+    submitState();
   }
 
   void _logIn(BuildContext cxt) {
@@ -197,8 +265,12 @@ class _SecondScreenState extends State<SecondScreen> {
   }
 
   final _formKey = GlobalKey<FormState>();
-  final myController = TextEditingController();
+  final myControllerName = TextEditingController();
+  final myControllerNickName = TextEditingController();
+  final myControllerPhone = TextEditingController();
+  final myControllerDOB = TextEditingController();
   bool isValidated = false;
+  bool isName = false, isPhoneNo = false, isDOB = false; bool ready = false, talker = true;
 
 
   @override
@@ -276,13 +348,13 @@ class _SecondScreenState extends State<SecondScreen> {
         body: ListView(
           padding: const EdgeInsets.all(20),
           children: <Widget>[
-            Container(
+            talker ? Container(
                 margin: const EdgeInsets.fromLTRB(15.0, 10.0, 0.0, 50.0),
                 child: Text(valBody,
                   style: TextStyle(color: color,
                       fontWeight: FontWeight.bold,
                       fontSize: 22.0),)
-            ),
+            ): Container(),
             CircleAvatar(
               // maxRadius: 50,
               radius: 120,
@@ -302,95 +374,119 @@ class _SecondScreenState extends State<SecondScreen> {
                     'assets/images/red-heart.jpg'),
               ),
             ),
-            const Center(
+             Center(
               child: Text(
-                'Sign Up Here',
-                style: TextStyle(
+                signUpWord,
+                style: const TextStyle(
                   fontSize: 50,
                 ),
               ),
             ),
+            Container(
+              margin: EdgeInsets.only(top:5.0, bottom: 5.0),
+            ),
             show ? Text(
               enterConfirm,
               style: const TextStyle(
-                fontSize: 20,
+                fontSize: 16,
               ),
             ) : const Text(''),
             Container(
-              padding: const EdgeInsets.all(15),
+              margin: EdgeInsets.only(top:10.0),
+              // padding: const EdgeInsets.all(10),
               child: Column(
                   children: [
                     show ? Container( //check if show == true, if true, then show container
                       color: colorS, // lightBlue
                       child: Form(
                         key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: <Widget>[
-                            TextFormField(
-                              decoration: const InputDecoration(
-                                icon: Icon(Icons.person),
-                                hintText: 'Your Name',
-                                labelText: 'Name',
+                        child: Padding(
+                          padding: const EdgeInsets.only(
+                              left: 10.0, bottom: 0.0, top: 0.0, right: 10.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: <Widget>[
+                              TextFormField(
+                                controller: myControllerName,
+                                decoration: const InputDecoration(
+                                  icon: Icon(Icons.person),
+                                  hintText: 'Your Name',
+                                  labelText: 'Name',
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'A Hyper name is required';
+                                  }
+                                  return null;
+                                },
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'A Hyper name is required';
-                                }
-                                return null;
-                              },
-                            ),
-                            TextFormField(
-                              decoration: const InputDecoration(
-                                icon: Icon(Icons.phone),
-                                hintText: 'Enter a phone number',
-                                labelText: 'Phone',
+                              TextFormField(
+                                controller: myControllerPhone,
+                                decoration: const InputDecoration(
+                                  icon: Icon(Icons.phone),
+                                  hintText: 'Enter a phone number',
+                                  labelText: 'Phone',
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter valid phone number';
+                                  }
+                                  return null;
+                                },
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter valid phone number';
-                                }
-                                return null;
-                              },
-                            ),
-                            TextFormField(
-                              decoration: const InputDecoration(
-                                icon: Icon(Icons.calendar_today),
-                                hintText: 'Enter your date of birth',
-                                labelText: 'Dob',
+                              TextFormField(
+                                controller: myControllerDOB,
+                                decoration: const InputDecoration(
+                                  icon: Icon(Icons.calendar_today),
+                                  hintText: 'Enter your date of birth',
+                                  labelText: 'Dob',
+                                ),
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Please enter valid date';
+                                  }
+                                  return null;
+                                },
                               ),
-                              validator: (value) {
-                                if (value == null || value.isEmpty) {
-                                  return 'Please enter valid date';
-                                }
-                                return null;
-                              },
-                            ),
-                            Container(
-                                padding: const EdgeInsets.only(
-                                    left: 130.0, bottom: 50.0, top: 40.0),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.grey, // Background color
-                                  ),
-                                  child: const Text('Submit'),
-                                  onPressed: () {
-                                    // It returns true if the form is valid, otherwise returns false
+                              Container(
+                                  padding: const EdgeInsets.only(
+                                      left: 130.0, bottom: 50.0, top: 40.0),
+                                  child: ElevatedButton(
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: colorSub, // Background color
+                                    ),
+                                    child: const Text('Submit'),
+                                    onPressed: () {
+                                      // It returns true if the form is valid, otherwise returns false
 
-                                    if (_formKey.currentState!.validate()) {
-                                      // If the form is valid, display a Snackbar.
-                                      // Scaffold.of(context).showSnackBar(SnackBar(content: Text('Data is in processing.')));
-                                      isValidated = true;
-                                      ScaffoldMessenger.of(context)
-                                          .showSnackBar(
-                                        const SnackBar(
-                                            content: Text('Processing Data..')),
-                                      );
-                                    }
-                                  },
-                                )),
-                          ],
-                        ),
+                                      if (_formKey.currentState!.validate()) {
+                                        // If the form is valid, display a Snackbar.
+                                        // Scaffold.of(context).showSnackBar(SnackBar(content: Text('Data is in processing.')));
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          const SnackBar(
+                                              content: Text('Processing Data..')),
+                                        );
+                                        // Nullify Fields and Add Runnable here.
+                                        setState(() {
+                                          Future.delayed(Duration(seconds: 5), () {
+                                            // Runs after every 5s
+                                            isValidated = true;
+                                            dan_fun.simpleDialog(context, myControllerName.text);
+
+                                            Future.delayed(Duration(seconds: 2), () {
+                                              // Runs after 5s
+                                              setState(() {show = false;});
+                                            });
+
+                                          });
+                                        });
+                                      }
+                                    },
+                                  )),
+                            ],
+                          ),
+                        )
                       ),
                     )
                         : Container(), //if show == false, show empty container.
@@ -403,7 +499,7 @@ class _SecondScreenState extends State<SecondScreen> {
                         // alignment: Alignment.center,
                         children: <Widget>[
 
-                          const Divider(),
+                          Container(),
                           Container(
                             alignment: Alignment.center,
                             // margin: const EdgeInsets.fromLTRB(0, 0.0, 0.0, 100.0),
@@ -413,6 +509,33 @@ class _SecondScreenState extends State<SecondScreen> {
                                     _someToast();
                                   } else {
                                     runConfirm();
+                                    if(ready == true){
+                                        Future.delayed(Duration(seconds: 2), () {
+                                          Navigator.push(context, MaterialPageRoute(builder:
+                                              (_) => HomeScreen(welcomeText: 'Hyper', urlLink: 'app.ihype.company/', userNym: textN)));
+                                          // myControllerName.clear();
+                                          // myControllerDOB.clear();
+                                          // myControllerPhone.clear(); // no need
+                                        });
+                                    }
+                                    else{
+                                      ScaffoldMessenger.of(context)
+                                          .showSnackBar(
+                                        SnackBar(
+                                            content: Text(snackText)),
+                                      );
+                                      Future.delayed(Duration(seconds: 3), () {
+                                        setState(() {
+                                          snackText = "Sign Up Complete!";
+                                          print(textN);
+                                          ready = true;
+                                          tapWord = "You're READY!";
+                                          signUpWord = "Super Hyper!";
+                                          talker = false;
+                                        });
+                                      });
+                                    }
+
                                   }
                                 },
                                 child: Text(tapWord)),
@@ -436,7 +559,7 @@ class _SecondScreenState extends State<SecondScreen> {
       // Change button value on Validation
       if (isValidated) {
         setState(() {
-          tapWord = 'Sign Up Now';
+          if(!ready) tapWord = 'Finish Sign Up Now!';
           // enterConfirm = 'Confirm your Details'; // to be used in confirmation
         });
       }
@@ -720,7 +843,7 @@ class _HomeStateWidget extends State<HomeScreen>{
                       ],
                     ),
 
-          title: Text("Hye, ${widget.welcomeText}!")
+          title: Text("Hye, ${widget.welcomeText} $userName!")
         )
       ),
     );
